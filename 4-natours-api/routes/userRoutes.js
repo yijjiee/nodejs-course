@@ -5,6 +5,14 @@ const authCon = require("../controllers/authenticationController");
 const router = express.Router();
 
 router.post("/signup", authCon.signup);
+router.post("/login", authCon.login);
+
+router.post("/forgotPassword", authCon.forgotPassword);
+router.patch("/resetPassword/:token", authCon.resetPassword);
+
+router.patch("/updatePassword", authCon.protect, authCon.updatePassword);
+router.patch("/updateProfile", authCon.protect, userCon.updateProfile);
+router.delete("/deleteAccount", authCon.protect, userCon.deleteAccount);
 
 router.route("/").get(userCon.getAllUsers).post(userCon.createUser);
 
