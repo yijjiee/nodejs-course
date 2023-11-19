@@ -6,6 +6,31 @@ const handleAsyncFn = require("../utils/handleAsync");
 const AppError = require("../utils/appError");
 const sendEmail = require("../utils/email");
 
+const sendToken = (user, statusCode, res) => {
+  const token = generateToken(user._id);
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRATION * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+  };
+
+  if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
+
+  res.cookie("jwt", token, cookieOptions);
+
+  // To remove password from output (Prevention of password showing to user(s))
+  user.password = undefined;
+
+  res.status(201).json({
+    status: "success",
+    token,
+    data: {
+      user,
+    },
+  });
+};
+
 const generateToken = (id) => {
   return jwt.sign({ id: id }, process.env.JWT_PRIVATEKEY, {
     expiresIn: process.env.JWT_EXPIRATION,
@@ -24,15 +49,7 @@ exports.signup = handleAsyncFn(async (req, res, next) => {
     role: req.body.role,
   });
 
-  const token = generateToken(newUser._id);
-
-  res.status(201).json({
-    status: "success",
-    token,
-    data: {
-      user: newUser,
-    },
-  });
+  sendToken(newUser, 201, res);
 });
 
 exports.login = async (req, res, next) => {
@@ -49,12 +66,7 @@ exports.login = async (req, res, next) => {
     return next(new AppError("Incorrect email or password", 401));
 
   // If everything is okay, send the jwt to client
-  const token = generateToken(user._id);
-
-  res.status(200).json({
-    status: "success",
-    token,
-  });
+  sendToken(user, 200, res);
 };
 
 // Middleware
@@ -185,14 +197,7 @@ exports.resetPassword = async (req, res, next) => {
   user.passwordResetToken = undefined;
   await user.save();
 
-  const token = generateToken(user._id);
-
-  res.status(200).json({
-    status: "success",
-    message:
-      "Password has been reset successfully. You may proceed to login with your new password.",
-    token,
-  });
+  sendToken(user, 200, res);
 };
 
 exports.updatePassword = handleAsyncFn(async (req, res, next) => {
@@ -210,12 +215,5 @@ exports.updatePassword = handleAsyncFn(async (req, res, next) => {
   user.passwordConfirm = req.body.passwordConfirm;
   await user.save();
 
-  const token = generateToken(user._id);
-
-  res.status(200).json({
-    status: "success",
-    message:
-      "Password has updated successfully. You may proceed to login with your new password.",
-    token,
-  });
+  sendToken(user, 200, res);
 });
