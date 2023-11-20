@@ -66,12 +66,31 @@ const tourSchema = new mongoose.Schema(
       select: false,
     },
     startDates: [Date],
-    locations: {
-      type: Object,
-    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: "Point",
+          enum: ["Point"]
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      }
+    ],
     startLocation: {
-      type: Object,
+      // GeoJSON
+      type: {
+        type: String,
+        default: "Point",
+        enum: ["Point"]
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
     },
+    guides: Array,
     slug: String,
     secretTour: {
       type: Boolean,

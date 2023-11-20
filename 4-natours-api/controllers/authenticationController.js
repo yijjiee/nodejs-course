@@ -52,7 +52,7 @@ exports.signup = handleAsyncFn(async (req, res, next) => {
   sendToken(newUser, 201, res);
 });
 
-exports.login = async (req, res, next) => {
+exports.login = handleAsyncFn(async (req, res, next) => {
   const { email, password } = req.body;
 
   // Check if email and password exist
@@ -67,7 +67,7 @@ exports.login = async (req, res, next) => {
 
   // If everything is okay, send the jwt to client
   sendToken(user, 200, res);
-};
+});
 
 // Middleware
 exports.protect = handleAsyncFn(async (req, res, next) => {
