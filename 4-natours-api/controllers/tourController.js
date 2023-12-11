@@ -2,6 +2,7 @@ const Tour = require("../models/tourModel");
 const APIFeatures = require("../utils/apiFeatures");
 const handleAsyncFn = require("../utils/handleAsync");
 const AppError = require("../utils/appError");
+const factory = require("./handlerFactory");
 
 /* const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
@@ -33,7 +34,7 @@ exports.getAllTours = handleAsyncFn(async (req, res, next) => {
 });
 
 exports.getTour = handleAsyncFn(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id);
+  const tour = await Tour.findById(req.params.id).populate("reviews");
 
   if (!tour) {
     return next(new AppError("No Tour found with that ID", 404));
@@ -47,7 +48,11 @@ exports.getTour = handleAsyncFn(async (req, res, next) => {
   });
 });
 
-exports.createTour = handleAsyncFn(async (req, res, next) => {
+exports.createTour = factory.createOne(Tour);
+exports.updateTour = factory.updateOne(Tour);
+exports.deleteTour = factory.deleteOne(Tour);
+
+/* exports.createTour = handleAsyncFn(async (req, res, next) => {
   const newTour = await Tour.create(req.body);
 
   res.status(201).json({
@@ -56,9 +61,9 @@ exports.createTour = handleAsyncFn(async (req, res, next) => {
       tour: newTour,
     },
   });
-});
+}); */
 
-exports.updateTour = handleAsyncFn(async (req, res, next) => {
+/* exports.updateTour = handleAsyncFn(async (req, res, next) => {
   const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
@@ -74,9 +79,9 @@ exports.updateTour = handleAsyncFn(async (req, res, next) => {
       tour,
     },
   });
-});
+}); */
 
-exports.deleteTour = handleAsyncFn(async (req, res, next) => {
+/* exports.deleteTour = handleAsyncFn(async (req, res, next) => {
   const tour = await Tour.findByIdAndDelete(req.params.id);
 
   if (!tour) {
@@ -87,7 +92,7 @@ exports.deleteTour = handleAsyncFn(async (req, res, next) => {
     status: "success",
     data: null,
   });
-});
+}); */
 
 exports.getTourStats = handleAsyncFn(async (req, res, next) => {
   const stats = await Tour.aggregate([

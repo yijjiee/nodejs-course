@@ -10,6 +10,7 @@ const AppError = require("./utils/appError");
 const ErrorController = require("./controllers/errorController");
 const tourRouter = require(`./routes/tourRoutes`);
 const userRouter = require(`./routes/userRoutes`);
+const reviewRouter = require(`./routes/reviewRoutes`);
 
 const app = express();
 
@@ -41,9 +42,18 @@ app.use(mongoSanitize());
 app.use(xss());
 
 // Prevent parameters pollution
-app.use(hpp({
-  whitelist: ["duration", "ratingsQuantity", "ratingsAverage", "maxGroupSize", "difficulty", "price"],
-}));
+app.use(
+  hpp({
+    whitelist: [
+      "duration",
+      "ratingsQuantity",
+      "ratingsAverage",
+      "maxGroupSize",
+      "difficulty",
+      "price",
+    ],
+  })
+);
 
 // Serving static files
 app.use(express.static(`${__dirname}/public`));
@@ -57,6 +67,7 @@ app.use((req, res, next) => {
 // Mounting Routers
 app.use("/api/v1/tours", tourRouter);
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/reviews", reviewRouter);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`URL cannot be found (${req.originalUrl})!`, 404));

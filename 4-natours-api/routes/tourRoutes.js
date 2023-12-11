@@ -1,9 +1,13 @@
 const express = require("express");
-const router = express.Router();
 const tourCon = require("../controllers/tourController");
 const authCon = require("../controllers/authenticationController");
+const reviewRouter = require("../routes/reviewRoutes");
 
+const router = express.Router();
 // router.param("id", checkID);
+
+// Nester router
+router.use("/:tourId/reviews", reviewRouter);
 
 router
   .route("/top-5-cheap-tours")
@@ -18,7 +22,11 @@ router
 router
   .route("/:id")
   .get(tourCon.getTour)
-  .patch(tourCon.updateTour)
+  .patch(
+    authCon.protect,
+    authCon.restrictTo("admin", "lead-guide"),
+    tourCon.updateTour
+  )
   .delete(
     authCon.protect,
     authCon.restrictTo("admin", "lead-guide"),

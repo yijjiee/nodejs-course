@@ -19,7 +19,7 @@ router.route("/").get(userCon.getAllUsers).post(userCon.createUser);
 router
   .route("/:id")
   .get(userCon.getUser)
-  .patch(userCon.updateUser)
-  .delete(userCon.deleteUser);
+  .patch(authCon.protect, authCon.restrictTo("admin"), userCon.updateUser)
+  .delete(authCon.protect, authCon.restrictTo("admin"), userCon.deleteUser);
 
 module.exports = router;
